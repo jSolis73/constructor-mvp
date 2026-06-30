@@ -1,0 +1,54 @@
+/* ── Viewport foundation ─────────────────────────────────────────────── */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ── App shell ────────────────────────────────────────────────────────── */
+.app-shell {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface-ground);
+}
+
+/* Content area that holds the Univer editor */
+.editor-area {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Field catalog sidebar items ─────────────────────────────────────── */
+.field-catalog-item {
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.field-catalog-item:hover {
+  background: var(--surface-hover);
+}
+
+/* ── Univer container ─────────────────────────────────────────────────── */
+/* Force Univer's root layout element to fill its wrapper */
+.univer-app-layout {
+  height: 100% !important;
+}
