@@ -183,7 +183,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       }
 
       // Sample data from first row of conclusionData for the given blockRef
-      const tableData = (conclusionData as Record<string, unknown>)[blockRef]
+      const tableData = (conclusionData as unknown as Record<string, unknown>)[blockRef]
       const firstRow = Array.isArray(tableData) ? (tableData[0] as Record<string, unknown>) : null
 
       // Write header row + sample data row into Univer
