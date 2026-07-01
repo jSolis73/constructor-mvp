@@ -20,7 +20,7 @@ function groupByGroupName(fields: FieldCatalogScalar[]): Record<string, FieldCat
 }
 
 export function FieldCatalogPanel({ visible, onHide }: FieldCatalogPanelProps) {
-  const { applyBindingToSelection, insertTableRegion, workbook } = useTemplateStore()
+  const { applyLabeledBinding, insertTableRegion, workbook } = useTemplateStore()
 
   const scalarGroups = groupByGroupName(fieldCatalogMock.scalars)
 
@@ -34,7 +34,7 @@ export function FieldCatalogPanel({ visible, onHide }: FieldCatalogPanelProps) {
     >
       <h3 className="mt-0 mb-2">Каталог полей</h3>
       <p className="text-sm text-color-secondary mb-3">
-        Кликните на поле, чтобы привязать его к выделенной ячейке.
+        Кликните на поле — в выделенную ячейку запишется подпись, в соседнюю справа — привязка к данным.
       </p>
 
       <Accordion multiple>
@@ -44,7 +44,7 @@ export function FieldCatalogPanel({ visible, onHide }: FieldCatalogPanelProps) {
               <div
                 key={field.path}
                 className="field-catalog-item flex align-items-center justify-content-between p-2 mb-1 border-round cursor-pointer hover:surface-hover"
-                onClick={() => applyBindingToSelection(field.path)}
+                onClick={() => applyLabeledBinding(field.path, field.title)}
                 style={{ border: '1px solid var(--surface-border)' }}
               >
                 <div>

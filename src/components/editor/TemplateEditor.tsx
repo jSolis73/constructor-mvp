@@ -2,11 +2,14 @@ import { useCallback, useEffect } from 'react'
 import { useUniverInstance } from './useUniverInstance'
 import { useTemplateStore } from '../../store/templateStore'
 import { mapSpecToWorkbookData } from '../../core/spec/specMapper'
+import { resolveBlockRefs } from '../../core/blocks/resolveBlockRefs'
+import { BlockDragOverlay } from './BlockDragOverlay'
 
 export function TemplateEditor() {
   const { currentSpec, setWorkbook, setLastSelection } = useTemplateStore()
 
-  const initialData = currentSpec ? mapSpecToWorkbookData(currentSpec) : undefined
+  // Resolve regions so table headers/sample rows are visible in the editor
+  const initialData = currentSpec ? mapSpecToWorkbookData(resolveBlockRefs(currentSpec)) : undefined
 
   const { containerRef, workbook } = useUniverInstance({
     readOnly: false,
@@ -37,10 +40,14 @@ export function TemplateEditor() {
   }, [workbook, setLastSelection])
 
   return (
-    <div
-      ref={containerRef}
-      style={{ width: '100%', height: '100%' }}
-      onPointerUp={handlePointerUp}
-    />
+    // position: relative so BlockDragOverlay (absolute, inset:0) covers the same area
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%' }}
+        onPointerUp={handlePointerUp}
+      />
+      <BlockDragOverlay containerRef={containerRef} />
+    </div>
   )
 }

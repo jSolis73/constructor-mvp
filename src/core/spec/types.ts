@@ -1,19 +1,25 @@
+export type BorderStyle = 'none' | 'thin' | 'medium' | 'thick'
+
 export interface SpecStyle {
+  // Font
+  font?: string
+  size?: number
   bold?: boolean
   italic?: boolean
-  fontSize?: number
-  fontFamily?: string
-  horizontalAlign?: 'left' | 'center' | 'right'
-  verticalAlign?: 'top' | 'middle' | 'bottom'
-  wrapText?: boolean
-  bgColor?: string
-  fontColor?: string
-  border?: {
-    top?: string
-    bottom?: string
-    left?: string
-    right?: string
-  }
+  underline?: boolean
+  // Alignment
+  align?: 'left' | 'center' | 'right'
+  vertical_align?: 'top' | 'middle' | 'bottom'
+  // Borders
+  border?: BorderStyle | 'all'
+  border_top?: BorderStyle
+  border_bottom?: BorderStyle
+  border_left?: BorderStyle
+  border_right?: BorderStyle
+  // Layout
+  wrap?: boolean
+  width?: number
+  height?: number
 }
 
 export interface SpecCellValue {
@@ -30,16 +36,32 @@ export interface SpecCell {
 }
 
 export interface SpecColumn {
-  path: string
-  title: string
+  header: string
+  binding: string
   width?: number
+  align?: 'left' | 'center' | 'right'
+  style?: SpecStyle
+  merge_rows?: boolean
 }
 
 export interface SpecRegion {
-  id: string
-  startRef: string
-  block_ref: string
-  columns: SpecColumn[]
+  id?: string
+  anchor: string
+  block_ref?: string
+  type?: 'table' | 'field'
+  binding?: string
+  label?: string
+  columns?: SpecColumn[]
+  style?: SpecStyle
+}
+
+export interface FooterCell {
+  after_region?: string
+  offset_rows?: number
+  ref: string
+  merge?: string
+  value: SpecCellValue
+  style?: SpecStyle
 }
 
 export interface SpecPage {
@@ -56,8 +78,9 @@ export interface SpecPage {
 export interface JsonSpec {
   id: string
   name: string
+  version: number
   page: SpecPage
   cells: SpecCell[]
   regions: SpecRegion[]
-  footer_cells?: SpecCell[]
+  footer_cells: FooterCell[]
 }

@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Menubar } from 'primereact/menubar'
 import { Button } from 'primereact/button'
 import { Toast } from 'primereact/toast'
-import { useRef } from 'react'
 import type { Toast as ToastRef } from 'primereact/toast'
 import { EditorToolbar } from '../components/editor/EditorToolbar'
 import { TemplateEditor } from '../components/editor/TemplateEditor'
@@ -19,7 +18,39 @@ export function AppShell() {
   const [listDialogVisible, setListDialogVisible] = useState(false)
 
   const toast = useRef<ToastRef>(null)
-  const { currentSpec, saveTemplate } = useTemplateStore()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { currentSpec, specEpoch, saveTemplate, exportSpecJson, importSpecJson } = useTemplateStore()
+
+  const handleExportJson = () => {
+    if (!currentSpec) {
+      toast.current?.show({ severity: 'warn', summary: 'Нет шаблона', detail: 'Сначала откройте или создайте шаблон.' })
+      return
+    }
+    exportSpecJson()
+    toast.current?.show({ severity: 'success', summary: 'Экспортировано', detail: 'JSON-spec скачан.' })
+  }
+
+  const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target?.result as string)
+        const result = importSpecJson(json)
+        if (result.ok) {
+          toast.current?.show({ severity: 'success', summary: 'Импортировано', detail: 'JSON-spec загружен.' })
+        } else {
+          toast.current?.show({ severity: 'error', summary: 'Ошибка валидации', detail: result.error, life: 8000 })
+        }
+      } catch {
+        toast.current?.show({ severity: 'error', summary: 'Ошибка', detail: 'Невалидный JSON-файл.' })
+      }
+      // Reset so same file can be imported again
+      e.target.value = ''
+    }
+    reader.readAsText(file)
+  }
 
   const handleSave = () => {
     if (!currentSpec) {
@@ -38,6 +69,9 @@ export function AppShell() {
         { label: 'Новый шаблон', icon: 'pi pi-plus', command: () => setNewDialogVisible(true) },
         { label: 'Открыть шаблон', icon: 'pi pi-folder-open', command: () => setListDialogVisible(true) },
         { label: 'Сохранить', icon: 'pi pi-save', command: handleSave },
+        { separator: true },
+        { label: 'Экспорт JSON-spec', icon: 'pi pi-download', command: handleExportJson },
+        { label: 'Импорт JSON-spec', icon: 'pi pi-upload', command: () => fileInputRef.current?.click() },
       ],
     },
   ]
@@ -59,11 +93,13 @@ export function AppShell() {
     <div className="app-shell">
       <Toast ref={toast} />
 
-      <Menubar
-        model={menuItems}
-        end={menuEnd}
-        style={{ borderRadius: 0, borderLeft: 'none', borderRight: 'none', borderTop: 'none', flexShrink: 0 }}
-      />
+      <div className="app-menubar">
+        <Menubar
+          model={menuItems}
+          end={menuEnd}
+          style={{ borderRadius: 0, borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}
+        />
+      </div>
 
       {currentSpec ? (
         <>
@@ -72,7 +108,7 @@ export function AppShell() {
             onSave={handleSave}
           />
           <div className="editor-area">
-            <TemplateEditor key={currentSpec.id} />
+            <TemplateEditor key={`${currentSpec.id}_${specEpoch}`} />
           </div>
         </>
       ) : (
@@ -91,6 +127,14 @@ export function AppShell() {
       <PreviewDialog visible={previewVisible} onHide={() => setPreviewVisible(false)} />
       <NewTemplateDialog visible={newDialogVisible} onHide={() => setNewDialogVisible(false)} />
       <TemplateListDialog visible={listDialogVisible} onHide={() => setListDialogVisible(false)} />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: 'none' }}
+        onChange={handleImportJson}
+      />
     </div>
   )
 }

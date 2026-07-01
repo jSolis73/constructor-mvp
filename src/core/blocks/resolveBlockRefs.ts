@@ -19,29 +19,33 @@ export function resolveBlockRefs(spec: JsonSpec): JsonSpec {
   const extraCells: SpecCell[] = []
 
   for (const region of spec.regions) {
-    const block = tableBlocksMock.find((b) => b.path === region.block_ref || b.item_uuid === region.block_ref)
+    if (!region.block_ref) continue
+    const block = tableBlocksMock.find(
+      (b) => b.path === region.block_ref || b.item_uuid === region.block_ref,
+    )
     if (!block) continue
 
-    const { row: startRow, col: startCol } = a1ToRowCol(region.startRef)
+    const columns = region.columns ?? []
+    const { row: startRow, col: startCol } = a1ToRowCol(region.anchor)
 
     // header row
-    region.columns.forEach((col, ci) => {
+    columns.forEach((col, ci) => {
       extraCells.push({
         ref: rowColToA1(startRow, startCol + ci),
-        value: { literal: col.title },
-        style: { bold: true, horizontalAlign: 'center' },
+        value: { literal: col.header },
+        style: { bold: true, align: col.align ?? 'center' },
       })
     })
 
-    // data rows
-    block.rows.forEach((rowData, ri) => {
-      region.columns.forEach((col, ci) => {
-        const pathKey = col.path.replace(/^.*\[\]\./, '')
-        const val = rowData[pathKey]
+    // data rows — use indexed bindings so the editor shows [path] placeholders
+    // and the preview/xlsx renderer resolves them via getByPath(data, 'intervals[0].number')
+    block.rows.forEach((_rowData, ri) => {
+      columns.forEach((col, ci) => {
+        const binding = col.binding.replace('[]', `[${ri}]`)
         extraCells.push({
           ref: rowColToA1(startRow + 1 + ri, startCol + ci),
-          value: { literal: val != null ? String(val) : '' },
-          style: {},
+          value: { binding },
+          style: col.align ? { align: col.align } : {},
         })
       })
     })

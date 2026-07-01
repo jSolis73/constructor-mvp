@@ -6,6 +6,31 @@ export interface IntervalRow {
   is_satisfied: string
 }
 
+export interface DefectRow {
+  number: number
+  location_mm: number
+  type: string
+  size_mm: number
+  is_admissible: string
+}
+
+export interface MeasurementRow {
+  number: number
+  parameter: string
+  nominal_mm: number
+  actual_mm: number
+  deviation_mm: number
+  is_satisfied: string
+}
+
+export interface ProbeRow {
+  number: number
+  label: string
+  location: string
+  result: string
+  is_satisfied: string
+}
+
 export interface ConclusionData {
   meta: {
     standard: string
@@ -32,6 +57,9 @@ export interface ConclusionData {
     defects_count: number
   }
   intervals: IntervalRow[]
+  defects: DefectRow[]
+  measurements: MeasurementRow[]
+  probes: ProbeRow[]
 }
 
 export const conclusionDataMock: ConclusionData = {
@@ -63,5 +91,14 @@ export const conclusionDataMock: ConclusionData = {
     { number: 1, start_mm: 0, end_mm: 120, defects_info: 'Дефектов не обнаружено', is_satisfied: 'Годен' },
     { number: 2, start_mm: 120, end_mm: 240, defects_info: 'Дефектов не обнаружено', is_satisfied: 'Годен' },
     { number: 3, start_mm: 240, end_mm: 360, defects_info: 'Дефектов не обнаружено', is_satisfied: 'Годен' },
+  ],
+  defects: [],
+  measurements: [
+    { number: 1, parameter: 'Смещение кромок', nominal_mm: 0, actual_mm: 0.3, deviation_mm: 0.3, is_satisfied: 'Годен' },
+    { number: 2, parameter: 'Усиление шва', nominal_mm: 2.0, actual_mm: 2.1, deviation_mm: 0.1, is_satisfied: 'Годен' },
+    { number: 3, parameter: 'Ширина шва', nominal_mm: 18.0, actual_mm: 18.5, deviation_mm: 0.5, is_satisfied: 'Годен' },
+  ],
+  probes: [
+    { number: 1, label: 'П-001', location: 'Зона сварного шва', result: 'Соответствует', is_satisfied: 'Годен' },
   ],
 }

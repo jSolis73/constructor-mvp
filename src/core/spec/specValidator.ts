@@ -1,23 +1,23 @@
 import { z } from 'zod'
 
+const BorderStyleSchema = z.enum(['none', 'thin', 'medium', 'thick'])
+
 const SpecStyleSchema = z.object({
+  font: z.string().optional(),
+  size: z.number().optional(),
   bold: z.boolean().optional(),
   italic: z.boolean().optional(),
-  fontSize: z.number().optional(),
-  fontFamily: z.string().optional(),
-  horizontalAlign: z.enum(['left', 'center', 'right']).optional(),
-  verticalAlign: z.enum(['top', 'middle', 'bottom']).optional(),
-  wrapText: z.boolean().optional(),
-  bgColor: z.string().optional(),
-  fontColor: z.string().optional(),
-  border: z
-    .object({
-      top: z.string().optional(),
-      bottom: z.string().optional(),
-      left: z.string().optional(),
-      right: z.string().optional(),
-    })
-    .optional(),
+  underline: z.boolean().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+  vertical_align: z.enum(['top', 'middle', 'bottom']).optional(),
+  border: z.union([BorderStyleSchema, z.literal('all')]).optional(),
+  border_top: BorderStyleSchema.optional(),
+  border_bottom: BorderStyleSchema.optional(),
+  border_left: BorderStyleSchema.optional(),
+  border_right: BorderStyleSchema.optional(),
+  wrap: z.boolean().optional(),
+  width: z.number().optional(),
+  height: z.number().optional(),
 })
 
 const SpecCellValueSchema = z.object({
@@ -34,16 +34,32 @@ const SpecCellSchema = z.object({
 })
 
 const SpecColumnSchema = z.object({
-  path: z.string(),
-  title: z.string(),
+  header: z.string(),
+  binding: z.string(),
   width: z.number().optional(),
+  align: z.enum(['left', 'center', 'right']).optional(),
+  style: SpecStyleSchema.optional(),
+  merge_rows: z.boolean().optional(),
 })
 
 const SpecRegionSchema = z.object({
-  id: z.string(),
-  startRef: z.string(),
-  block_ref: z.string(),
-  columns: z.array(SpecColumnSchema),
+  id: z.string().optional(),
+  anchor: z.string(),
+  block_ref: z.string().optional(),
+  type: z.enum(['table', 'field']).optional(),
+  binding: z.string().optional(),
+  label: z.string().optional(),
+  columns: z.array(SpecColumnSchema).optional(),
+  style: SpecStyleSchema.optional(),
+})
+
+const FooterCellSchema = z.object({
+  after_region: z.string().optional(),
+  offset_rows: z.number().optional(),
+  ref: z.string(),
+  merge: z.string().optional(),
+  value: SpecCellValueSchema,
+  style: SpecStyleSchema.optional(),
 })
 
 const SpecPageSchema = z.object({
@@ -60,10 +76,11 @@ const SpecPageSchema = z.object({
 export const JsonSpecSchema = z.object({
   id: z.string(),
   name: z.string(),
+  version: z.number(),
   page: SpecPageSchema,
   cells: z.array(SpecCellSchema),
   regions: z.array(SpecRegionSchema),
-  footer_cells: z.array(SpecCellSchema).optional(),
+  footer_cells: z.array(FooterCellSchema),
 })
 
 export function validateSpec(data: unknown) {

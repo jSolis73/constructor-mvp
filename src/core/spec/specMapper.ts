@@ -48,22 +48,16 @@ function mapStyleToUniver(style?: SpecStyle): IStyleData | undefined {
   const s: IStyleData = {}
   if (style.bold !== undefined) s.bl = style.bold ? 1 : 0
   if (style.italic !== undefined) s.it = style.italic ? 1 : 0
-  if (style.fontSize) s.fs = style.fontSize
-  if (style.fontFamily) s.ff = style.fontFamily
-  if (style.wrapText !== undefined) s.tb = style.wrapText ? 3 : 1
-  if (style.horizontalAlign) {
+  if (style.size) s.fs = style.size
+  if (style.font) s.ff = style.font
+  if (style.wrap !== undefined) s.tb = style.wrap ? 3 : 1
+  if (style.align) {
     const alignMap: Record<string, number> = { left: 1, center: 2, right: 3 }
-    s.ht = alignMap[style.horizontalAlign]
+    s.ht = alignMap[style.align]
   }
-  if (style.verticalAlign) {
+  if (style.vertical_align) {
     const vAlignMap: Record<string, number> = { top: 1, middle: 2, bottom: 3 }
-    s.vt = vAlignMap[style.verticalAlign]
-  }
-  if (style.fontColor) {
-    s.cl = { rgb: style.fontColor }
-  }
-  if (style.bgColor) {
-    s.bg = { rgb: style.bgColor }
+    s.vt = vAlignMap[style.vertical_align]
   }
   return s
 }
@@ -73,19 +67,17 @@ function mapStyleFromUniver(s?: IStyleData): SpecStyle | undefined {
   const style: SpecStyle = {}
   if (s.bl !== undefined) style.bold = s.bl === 1
   if (s.it !== undefined) style.italic = s.it === 1
-  if (s.fs) style.fontSize = s.fs
-  if (s.ff) style.fontFamily = s.ff
-  if (s.tb !== undefined) style.wrapText = s.tb === 3
+  if (s.fs) style.size = s.fs
+  if (s.ff) style.font = s.ff
+  if (s.tb !== undefined) style.wrap = s.tb === 3
   if (s.ht != null) {
     const alignMap: Record<number, 'left' | 'center' | 'right'> = { 1: 'left', 2: 'center', 3: 'right' }
-    style.horizontalAlign = alignMap[s.ht]
+    style.align = alignMap[s.ht]
   }
   if (s.vt != null) {
     const vAlignMap: Record<number, 'top' | 'middle' | 'bottom'> = { 1: 'top', 2: 'middle', 3: 'bottom' }
-    style.verticalAlign = vAlignMap[s.vt]
+    style.vertical_align = vAlignMap[s.vt]
   }
-  if (s.cl?.rgb) style.fontColor = s.cl.rgb
-  if (s.bg?.rgb) style.bgColor = s.bg.rgb
   return style
 }
 

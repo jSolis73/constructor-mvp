@@ -25,8 +25,14 @@ body {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   background: var(--surface-ground);
+}
+
+/* Menubar must sit above the Univer canvas stacking context */
+.app-menubar {
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
 }
 
 /* Content area that holds the Univer editor */
@@ -51,4 +57,124 @@ body {
 /* Force Univer's root layout element to fill its wrapper */
 .univer-app-layout {
   height: 100% !important;
+}
+
+/* ── Block drag overlay ───────────────────────────────────────────────── */
+
+/* Outline drawn over each inserted table block */
+.block-overlay {
+  position: absolute;
+  border: 1.5px solid rgba(99, 102, 241, 0.65);
+  background: rgba(99, 102, 241, 0.04);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Floating badge above each block — primary drag trigger */
+.block-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  height: 20px;
+  background: rgba(79, 70, 229, 0.9);
+  color: #fff;
+  font-size: 10px;
+  font-family: monospace;
+  border-radius: 3px 3px 0 0;
+  cursor: grab;
+  pointer-events: auto;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: 0 -1px 3px rgba(0,0,0,0.15);
+  z-index: 11;
+}
+
+.block-badge:hover {
+  background: rgba(67, 56, 202, 1);
+}
+
+.block-badge:active {
+  cursor: grabbing;
+}
+
+/* Drag handle strip shown at the top (title row height) of each block */
+.block-drag-handle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  cursor: grab;
+  pointer-events: auto;
+  background: rgba(99, 102, 241, 0.14);
+  color: rgba(79, 70, 229, 0.95);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+  user-select: none;
+  overflow: hidden;
+  transition: background 0.12s;
+}
+
+.block-drag-handle:hover {
+  background: rgba(99, 102, 241, 0.26);
+}
+
+.block-drag-handle:active {
+  cursor: grabbing;
+}
+
+.block-label {
+  font-size: 10px;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}
+
+/* ── Field (scalar binding) block variants — green colour scheme ─── */
+.block-overlay--field {
+  border-color: rgba(16, 185, 129, 0.65);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.block-badge--field {
+  background: rgba(5, 150, 105, 0.9);
+}
+
+.block-badge--field:hover {
+  background: rgba(4, 120, 87, 1);
+}
+
+.block-drag-handle--field {
+  background: rgba(16, 185, 129, 0.14);
+  color: rgba(5, 150, 105, 0.95);
+  border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+.block-drag-handle--field:hover {
+  background: rgba(16, 185, 129, 0.26);
+}
+
+/* Ghost block rendered at the potential drop position */
+.block-ghost {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.block-ghost--valid {
+  border: 2px dashed rgba(99, 102, 241, 0.85);
+  background: rgba(99, 102, 241, 0.09);
+}
+
+.block-ghost--invalid {
+  border: 2px dashed rgba(239, 68, 68, 0.9);
+  background: rgba(239, 68, 68, 0.06);
+  animation: block-invalid-pulse 0.55s ease-in-out infinite;
+}
+
+@keyframes block-invalid-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18); }
+  50%       { box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.08); }
 }
